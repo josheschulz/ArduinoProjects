@@ -1,40 +1,37 @@
 #include <Logging.h>
 
-int buzzerOn = 0;
+volatile int buzzerOn = 0;
+//Interrupts work great for this but they still bounce
+//  around.  Let's fix that.
+const long BOUNCE_DELAY = 100;
+
+volatile long lastInterruptFire = 0;
 
 void setup(){
   Log.Init(LOG_LEVEL_DEBUG, 9600);
+  attachInterrupt(0, toggleStatus, RISING);
   pinMode(7, OUTPUT);
-  pinMode(4, INPUT);
+}
+
+///On Pin 2
+void toggleStatus(){
+  Log.Info("Interrupt Fired"CR);
+  if(millis() - lastInterruptFire > BOUNCE_DELAY){
+    Log.Info("Bounce Delay Met"CR);
+    if(buzzerOn == 0){
+      //Turn it on
+      buzzerOn = 1;
+      digitalWrite(7, HIGH);
+    } else {
+      //turn it off
+      buzzerOn = 0;
+      digitalWrite(7, LOW);
+    }
+  }
+  lastInterruptFire = millis();
 }
 
 void loop(){
-  delay(250);
-  int switchState = 0;
-  switchState = digitalRead(4);
-
-  Log.Info("SwitchStatus %d, Buzzer Status", buzzerOn);
-  if(switchState == LOW){
-      Log.Info("LOW \n");
-  } else {
-      Log.Info("HIGH \n");
-  }
-
-  //The 
-  if(switchState == HIGH && buzzerOn ==0 ){
-     buzzerOn = 1;
-     Log.Debug("Turning it on"CR);
-   } else if (switchState == HIGH && buzzerOn == 1){
-     buzzerOn = 0;
-     Log.Debug("Turning it off"CR);
-   }
-  
-  if(buzzerOn != 0){
-    Log.Debug("Buzzer is on \n");
-    digitalWrite(7, HIGH);
-  } else {
-    digitalWrite(7, LOW);   
-  }
 }
 
 
