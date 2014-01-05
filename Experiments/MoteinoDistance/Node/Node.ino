@@ -10,15 +10,15 @@
 #define ACK_TIME      30 // max # of ms to wait for an ack
 #define LED           9  // Moteinos have LEDs on D9
 #define SERIAL_BAUD   115200
-#define LOOPS         1
+#define LOOPS         25
 
 #define SUCCESS_LED  4
+#define ACK_LED      6
 
 int TRANSMITPERIOD = 300; //transmit a packet to gateway so often (in ms)
 
 unsigned int sequence = 0;
 unsigned int runNumber = 0;
-unsigned int powerLevel = 0;
 unsigned int loopCount = 0;
 
 volatile bool advanceRun = false;
@@ -28,7 +28,6 @@ RFM69 radio;
 
 typedef struct {
   unsigned int runNumber;
-  unsigned int powerLevel;
   long sendTime;
   unsigned int sequence;
 } Payload;
@@ -59,7 +58,8 @@ void setup() {
 #endif
    radio.encrypt(ENCRYPTKEY);
    Serial.println("Beginning Transmission");
-  
+   Blink(ACK_LED, 1000);
+   Blink(LED, 1000); 
  }
 
 long lastPeriod = -1;
@@ -68,7 +68,6 @@ void loop() {
       runNumber++;
       digitalWrite(SUCCESS_LED, LOW);
       loopCount = 0;
-      powerLevel = 0;      
       advanceRun = false;
    }
 
@@ -89,25 +88,14 @@ void loop() {
    int currPeriod = millis()/TRANSMITPERIOD;
    if (currPeriod != lastPeriod){
       lastPeriod=currPeriod;
-      //  Our test is: Run through every power level, send 10 of each message
-      //   i don't think this does anything on the high powered chip but I thought
-      // I read somewhere that the 69hw wouldn't work if high power mode wasn't on.
-      //Going to do it but not expecting it to work.  Either way still want the data.
-      //Time to get live!
+
       if(loopCount >= LOOPS){
-         //Update the power level
-         powerLevel++;
-         if(powerLevel > 31){
-            powerLevel = 0;
-            //TODO: Turn on the LED so we know we've hit all of our levels
-            digitalWrite(SUCCESS_LED, HIGH);
-         }
+         digitalWrite(SUCCESS_LED, HIGH);
          loopCount = 0;
       }
 
       Payload output;   
       output.runNumber = runNumber;
-      output.powerLevel = powerLevel;
       output.sendTime = millis();
       output.sequence = sequence;
  
@@ -115,11 +103,11 @@ void loop() {
       Serial.print(runNumber);
       Serial.print("], Sequence [");
       Serial.print(sequence);
-      Serial.print("], Power [");
-      Serial.print(powerLevel);
    
       if(radio.sendWithRetry(GATEWAYID, (const void*)(&output), sizeof(output), 2,ACK_TIME )){
          Serial.println("] [SUCCESS]");       
+         //Blink the ACK_LED
+         Blink(ACK_LED, 3);
       } else {
          Serial.println("] [FAILURE]");       
       }

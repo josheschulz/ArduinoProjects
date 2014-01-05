@@ -17,7 +17,6 @@
 
 typedef struct {
   unsigned int runNumber;
-  unsigned int powerLevel;
   long sendTime;
   unsigned int sequence;
 } Payload;
@@ -42,7 +41,7 @@ void setup() {
 #endif
   radio.encrypt(ENCRYPTKEY);
   radio.promiscuous(promiscuousMode);
-  Serial.println("Run Number,Sequence Number,Sending PowerLevel, SendTime,RSSI");
+  Serial.println("Run Number,Sequence Number,SendTime,RSSI");
 }
 
 void loop() {
@@ -52,17 +51,13 @@ void loop() {
       } else {
          Payload theData = *(Payload*)radio.DATA;
 
-      //   if(theData.runNumber != 0){
-            Serial.print(theData.runNumber);
-            Serial.print(",");
-            Serial.print(theData.sequence);
-            Serial.print(",");
-            Serial.print(theData.powerLevel);
-            Serial.print(",");
-            Serial.print(theData.sendTime);
-            Serial.print(",");
-            Serial.println(radio.RSSI);
-       //  }
+         Serial.print(theData.runNumber);
+         Serial.print(",");
+         Serial.print(theData.sequence);
+         Serial.print(",");
+         Serial.print(theData.sendTime);
+         Serial.print(",");
+         Serial.println(radio.RSSI);
       }
 
       if (radio.ACK_REQUESTED){
@@ -70,9 +65,7 @@ void loop() {
          delay(10);
       }
       Blink(LED,3);
-  } else {
-//      Serial.println("No data waiting...");
-   }
+  }
 }
 
 
