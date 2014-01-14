@@ -27,4 +27,10 @@ We did three runs:  Zoe by herself, Zoe and Kyra, Then all three of us.
 It's hard to tell for sure because we went different speeds, but it is clear that with the three of
 us riding there are more very bad samples.  We may want to throw out anything under a certain floor.
 
-I wish there were more tour de fats so I could play around with it.`
+I wish there were more tour de fats so I could play around with it.
+
+Data is in GateWayData
+https://github.com/josheschulz/ArduinoProjects/blob/master/Experiments/MoteinoDistance/Gateway/data/
+
+The pictures are: https://github.com/josheschulz/ArduinoProjects/blob/master/Experiments/MoteinoDistance/Gateway/data/Average_over_distance.png
+and: https://github.com/josheschulz/ArduinoProjects/blob/master/Experiments/MoteinoDistance/Gateway/data/Average_over_distance.png
